@@ -8,7 +8,7 @@ defmodule SqsExample.Application do
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
-    children = for i <- 0..10 do
+    children = for i <- 0..20 do
       worker(SqsExample.SQSConsumer, [i], id: :"sqs_#{i}")
     end
 

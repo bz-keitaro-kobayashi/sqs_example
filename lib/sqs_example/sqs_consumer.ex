@@ -22,17 +22,26 @@ defmodule SqsExample.SQSConsumer do
     [messages: msgs] = :erlcloud_sqs.receive_message(@queue_name, :all, 1, 30, 20, conf)
     case msgs do
       [msg | _] ->
-        process_message(msg |> Enum.into(%{}), state)
-      [] -> 
-        # log("empty response", state)
-        nil
+        msg
+        |> Enum.into(%{})
+        |> parse_message
+        |> process_message(state)
+      [] -> nil
     end
     send(self(), :poll)
     {:noreply, state}
   end
 
-  defp process_message(%{body: body, receipt_handle: receipt_handle}, state) do
-    log("processed: #{inspect body}", state)
+  defp parse_message(%{body: body} = msg) do
+    parsed_body = Poison.Parser.parse!(body)
+    Map.put(msg, :parsed_body, parsed_body)
+  end
+
+  defp process_message(%{parsed_body: body, receipt_handle: receipt_handle}, state) do
+    sleep_seconds = body["processing_time"]
+    log("starting: #{inspect body["id"]} (takes #{sleep_seconds}s)", state)
+    Process.sleep(sleep_seconds * 1000)
+    log("done: #{inspect body["id"]}", state)
     delete_message(receipt_handle, state)
   end
 

@@ -29,6 +29,9 @@ defmodule SqsExample.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:erlcloud, "~> 2.2.10"}]
+    [
+      {:erlcloud, "~> 2.2.10"},
+      {:poison, "~> 3.1.0"}
+    ]
   end
 end
