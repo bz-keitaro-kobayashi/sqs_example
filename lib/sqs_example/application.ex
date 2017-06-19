@@ -9,7 +9,15 @@ defmodule SqsExample.Application do
     import Supervisor.Spec, warn: false
 
     children = for i <- 0..20 do
-      worker(SqsExample.SQSConsumer, [i], id: :"sqs_#{i}")
+      worker(SqsExample.SQSConsumer, [i, 'example-queue'], id: :"sqs_#{i}")
+    end
+
+    children = children ++ [
+      worker(SqsExample.DoneManager, [])
+    ]
+
+    children = children ++ for i <- 0..20 do
+      worker(SqsExample.SQSConsumer, [i, 'example-dlq'], id: :"dlq_#{i}")
     end
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

@@ -1,0 +1,6 @@
+[
+	{
+		"Id": "dlq_1",
+		"MessageBody": "{\"id\":\"dlq_1\",\"processing_time\":20}"
+	}
+]
