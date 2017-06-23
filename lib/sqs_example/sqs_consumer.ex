@@ -38,6 +38,11 @@ defmodule SqsExample.SQSConsumer do
     Map.put(msg, :parsed_body, parsed_body)
   end
 
+  defp process_message(%{receipt_handle: receipt_handle} = full_msg, %{queue_name: 'example-dlq'} = state) do
+    Logger.debug "DLQ: #{inspect full_msg}"
+    delete_message(receipt_handle, state)
+  end
+
   defp process_message(%{parsed_body: body, receipt_handle: receipt_handle, message_id: message_id}, state) do
     should_log = do_process(body, state)
 
@@ -74,17 +79,16 @@ defmodule SqsExample.SQSConsumer do
     :no_log
   end
 
+  defp do_process(%{"crash" => true}, _state) do
+    raise "bye"
+  end
+
   defp delete_message(receipt_handle, %{conf: conf, queue_name: queue_name}) do
     :ok = :erlcloud_sqs.delete_message(queue_name, receipt_handle, conf)
   end
 
-  defp log(str, %{id: id, queue_name: queue_name}) do
-    ex = if queue_name == 'example-dlq' do
-      "DLQ"
-    else
-      "   "
-    end
+  defp log(str, %{id: id}) do
     id_s = String.pad_leading(to_string(id), 2, "0")
-    Logger.debug("[#{id_s}] #{ex} #{str}")
+    Logger.debug("[#{id_s}] #{str}")
   end
 end

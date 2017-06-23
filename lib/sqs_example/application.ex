@@ -16,7 +16,7 @@ defmodule SqsExample.Application do
       worker(SqsExample.DoneManager, [])
     ]
 
-    children = children ++ for i <- 0..20 do
+    children = children ++ for i <- 0..5 do
       worker(SqsExample.SQSConsumer, [i, 'example-dlq'], id: :"dlq_#{i}")
     end
 
