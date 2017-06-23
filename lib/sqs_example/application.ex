@@ -12,13 +12,13 @@ defmodule SqsExample.Application do
       worker(SqsExample.SQSConsumer, [i, 'example-queue'], id: :"sqs_#{i}")
     end
 
-    children = children ++ [
-      worker(SqsExample.DoneManager, [])
-    ]
-
     children = children ++ for i <- 0..5 do
       worker(SqsExample.SQSConsumer, [i, 'example-dlq'], id: :"dlq_#{i}")
     end
+
+    children = children ++ [
+      worker(SqsExample.DoneManager, [])
+    ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
     # for other strategies and supported options

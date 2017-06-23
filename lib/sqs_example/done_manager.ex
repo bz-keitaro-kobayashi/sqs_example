@@ -1,6 +1,11 @@
 defmodule SqsExample.DoneManager do
+  require Logger
+  
   def start_link() do
-    Agent.start_link(fn -> %{} end, name: __MODULE__)
+    Agent.start_link(fn ->
+      Logger.debug("Started.")
+      %{}
+    end, name: __MODULE__)
   end
 
   def done_count(id) do
